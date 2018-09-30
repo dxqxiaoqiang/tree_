@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Document</title>
+<link rel="stylesheet" href="/sxzb/js/dtree/dtree.css" type="text/css"></link>
+<% include("/common/common_css.html"){} %>
+<style type="text/css">
+html, body, .layui-ps-inputMessage-box {
+	height: 100%;
+	overflow: hidden;
+}
+.layui-form-label {
+	width: 120px;
+	style ="margin-left: 100px "";
+}
+</style>
+</head>
+<body>
+<div class="dtree" style='position: fixed; z-index: 999; top: 0;width:80px;'></div> 
+<!-- 	<div class="panel-edit" style="float:right; margin-left:8"> -->
+	<form class="layui-form tenant_add" action="">
+			<div class="Input_box">
+				<blockquote class="layui-elem-quote" style="border-left: 5px">新增子菜单</blockquote>
+				<input type="hidden" name="id" value="" />
+				<div class="layui-form-item">
+					<label class="layui-form-label"><span class="required">*</span>产品分类名称</label>
+					<div class="layui-input-block">
+						<input type="text" name="name" value="" lay-verify="required"
+							placeholder="产品分类名称" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+			 <div class="layui-form-item">
+					<label class="layui-form-label"><span class="required">*</span>父节点</label>
+				<div class="layui-input-block">	
+			       <input type="hidden" id="pid" name="pid" value="0" />			
+	               <input type="text" name="dddd" class="FormStyle2" onClick='showTree(this,"pid")' style="height:35px" readonly="readonly" placeholder="父节点"/>	 															
+                             <% include("/common/common_js.html"){} %>
+                              <script type="text/javascript" src="/sxzb/js/jquery-3.1.0.min.js"></script> 				
+							  <script type="text/javascript" src="/sxzb/js/dtree/dtree.js"></script> 				    
+								<script type="text/javascript">
+								 function loadData() {
+									tree = new dTree('tree');
+									tree.add(0, -1, '请选择父类');
+									$.ajax({
+										url : "${ctxPath}/type/list",
+										dataType : 'text',
+										type : 'get',
+										async : false,
+										success : function(data) {
+											var obj = JSON.parse(data);
+											for (var i = 0; i < obj.length; i++) {									 
+												tree.add(obj[i].id, obj[i].pid, obj[i].name,  "javascript:setSrcValue('"+obj[i].name+"','"+obj[i].id+"')" ); 
+											}
+											document.write("<div id=\"combx\" style=\"display:none;\">"+tree+"</div>");
+ 			 								async : true;
+										}
+									});
+								}
+								loadData();
+						</script>											
+			    </div>
+				<div class="layui-form-item last-element-bottom">
+					<div class="layui-input-block" style="margin-left: 218px;">
+						<button class="layui-btn layui-btn-normal" lay-submit
+							lay-filter="formDemo" id="postData">保存</button>
+						<button type="reset" class="layui-btn layui-btn-primary">返回</button>
+					</div>
+				</div>
+			</div>
+		  </div>
+	</form>
+<!-- </div> -->
+	<script type="text/javascript"> 
+// 	 function loadData() {
+// 			tree = new dTree('tree');
+// 			tree.add(0, -1, '请选择父类');
+// 			$.ajax({
+// 				url : "${ctxPath}/type/list",
+// 				dataType : 'text',
+// 				type : 'get',
+// 				async :false,
+// 				success : function(data) {
+// 					var obj = JSON.parse(data);
+// 					for (var i = 0; i < obj.length; i++) {									 
+// 						tree.add(obj[i].id, obj[i].pid, obj[i].name, "","","",true ); 
+// 					}
+// 					document.write(tree);
+// 				}
+// 			});
+// 		}
+// 		loadData();
+		var srcElement = null;
+		var valueElement = null;
+		showTree =function (item,valueId){
+			$("#combx").css("display","block");	
+			$("#combx").css("margin-left","45px");	
+			srcElement = window.event.srcElement;
+			valueElement = document.getElementById(valueId);
+	    }		 		
+		 setSrcValue=function (text,value){
+			 $("#combx").css("display","none");				 
+			srcElement.value = text;
+			valueElement.value = value;
+		}		
+		var form = layui.form;
+		form.on('submit(formDemo)', function(data) {
+			$.ajax({
+				url : "${ctxPath }/type/insertNode",
+				type : "POST",
+				dataType : "json",
+				data : data.field,
+				success : function(data) {
+					layer.confirm('保存成功!', function(index) {
+						layer.closeAll();
+					});
+				},
+				error : function() {
+					layer.alert('保存失败', function(index) {
+						layer.closeAll();
+
+					});
+				}
+
+			});
+
+			return false;
+
+		});
+	</script>
+</body>
+</html>
+
+
+
+
+
